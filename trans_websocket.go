@@ -47,7 +47,8 @@ func (t *websocketTransport) webSocketHandler(ws *websocket.Conn) {
 			t.Close()
 			return
 		}
-		t.conn.Receive(newMessage(b))
+		// TODO: decode frame and packet type, then pass to receive
+		// t.conn.Receive(newMessage(b))
 	}
 }
 

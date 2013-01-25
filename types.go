@@ -1,7 +1,20 @@
 package blimp
 
 import (
+	"io"
 	"net/http"
+)
+
+const (
+	TypeDisconnect = int(iota)
+	TypeConnect
+	TypeHeartbeat
+	TypeMessage
+	TypeJsonMessage
+	TypeEvent
+	TypeAck
+	TypeError
+	TypeNoop
 )
 
 // Conn represents a session based client connection
@@ -23,8 +36,18 @@ type Handler interface {
 	Received(conn Conn, m Message)
 }
 
+// [message type] ':' [message id ('+')] ':' [message endpoint] (':' [message data]) 
 type Message interface {
+	Type() int
+	Id() int
+	Ack() bool
+	Endpoint() string
 	Bytes() []byte
+}
+
+type Codec interface {
+	Encode(m Message, w io.Writer) (n int, err error)
+	Decode(b []byte) (m Message, err error)
 }
 
 type Transport interface {
