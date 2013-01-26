@@ -10,7 +10,7 @@ var StdCodec Codec = &codec{}
 
 type codec struct{}
 
-func (c *codec) Encode(m Message, w io.Writer) (int, error) {
+func (c *codec) Encode(m Message, w io.Writer) (int64, error) {
 	// Write head
 	var b bytes.Buffer
 	b.WriteString(strconv.Itoa(m.Type()))
@@ -26,14 +26,14 @@ func (c *codec) Encode(m Message, w io.Writer) (int, error) {
 	b.WriteByte(':')
 	n, err := w.Write(b.Bytes())
 	if err != nil {
-		return n, err
+		return int64(n), err
 	}
 
 	// Write data
-	n2, err := w.Write(m.Bytes())
-	n += n2
+	n2, err := io.Copy(w, m)
+	n2 += int64(n)
 
-	return n, err
+	return n2, err
 }
 
 func (c *codec) Decode(b []byte) (Message, error) {

@@ -38,15 +38,15 @@ type Handler interface {
 
 // [message type] ':' [message id ('+')] ':' [message endpoint] (':' [message data]) 
 type Message interface {
+	io.Reader
 	Type() int
 	Id() int
 	Ack() bool
 	Endpoint() string
-	Bytes() []byte
 }
 
 type Codec interface {
-	Encode(m Message, w io.Writer) (n int, err error)
+	Encode(m Message, w io.Writer) (n int64, err error)
 	Decode(b []byte) (m Message, err error)
 }
 

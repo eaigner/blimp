@@ -1,20 +1,24 @@
 package blimp
 
+import (
+	"io"
+)
+
 type message struct {
 	typ      int
 	id       int
 	ack      bool
 	endpoint string
-	data     []byte
+	reader   io.Reader
 }
 
-func newMessage(typ, id int, ack bool, endpoint string, data []byte) Message {
+func newMessage(typ, id int, ack bool, endpoint string, r io.Reader) Message {
 	return &message{
 		typ:      typ,
 		id:       id,
 		ack:      ack,
 		endpoint: endpoint,
-		data:     data,
+		reader:   r,
 	}
 }
 
@@ -34,6 +38,6 @@ func (m *message) Endpoint() string {
 	return m.endpoint
 }
 
-func (m *message) Bytes() []byte {
-	return m.data
+func (m *message) Read(p []byte) (n int, err error) {
+	return m.reader.Read(p)
 }
