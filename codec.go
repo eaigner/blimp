@@ -38,6 +38,7 @@ func (c *codec) Encode(m Message, w io.Writer) (int64, error) {
 }
 
 func (c *codec) Decode(b []byte) (Message, error) {
+	// [message type] ':' [message id ('+')] ':' [message endpoint] (':' [message data]) 
 	parts := bytes.SplitN(b, []byte(":"), 4)
 	if len(parts) < 3 {
 		return nil, errors.New("invalid packet")

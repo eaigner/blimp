@@ -36,7 +36,6 @@ type Handler interface {
 	Received(conn Conn, m Message)
 }
 
-// [message type] ':' [message id ('+')] ':' [message endpoint] (':' [message data]) 
 type Message interface {
 	io.Reader
 	Type() int
