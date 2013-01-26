@@ -39,5 +39,8 @@ func (m *message) Endpoint() string {
 }
 
 func (m *message) Read(p []byte) (n int, err error) {
-	return m.reader.Read(p)
+	if m.reader != nil {
+		return m.reader.Read(p)
+	}
+	return 0, nil
 }
