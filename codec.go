@@ -2,6 +2,7 @@ package blimp
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"strconv"
 )
@@ -37,5 +38,27 @@ func (c *codec) Encode(m Message, w io.Writer) (int64, error) {
 }
 
 func (c *codec) Decode(b []byte) (Message, error) {
-	panic("TODO: implement")
+	parts := bytes.SplitN(b, []byte(":"), 4)
+	if len(parts) < 3 {
+		return nil, errors.New("invalid packet")
+	}
+	mtype, err := strconv.Atoi(string(parts[0]))
+	if err != nil {
+		return nil, err
+	}
+	idPart := parts[1]
+	ack := bytes.HasSuffix(idPart, []byte("+"))
+	if ack {
+		idPart = idPart[:len(idPart)-1]
+	}
+	pid, err := strconv.Atoi(string(idPart))
+	if err != nil {
+		return nil, err
+	}
+	endpoint := string(parts[2])
+	var r io.Reader
+	if len(parts) == 4 {
+		r = bytes.NewBuffer(parts[3])
+	}
+	return newMessage(mtype, pid, ack, endpoint, r), nil
 }
